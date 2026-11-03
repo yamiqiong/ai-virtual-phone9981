@@ -29,6 +29,7 @@ import { Toggle } from "./ui/form";
 import { loadChatAppSettings, saveChatAppSettings } from "@/lib/chat-storage";
 import { loadKeepAlive, saveKeepAlive } from "@/lib/weixin-storage";
 import { BINDING_ACCENTS, CONTENT_APP_ACCENTS } from "@/lib/ui-accent-colors";
+import { loadMultiControllerConfig, saveMultiControllerConfig } from "@/lib/settings-storage";
 
 export const SettingsContext = createContext<{
     setSubpageTitle: (title: string | null) => void;
@@ -57,6 +58,7 @@ type SubPage =
     | "toolbox"
     | "agentComputer"
     | "moderation"
+    | "multiController"
     | "about";
 
 const SETTINGS_MENU = [
@@ -115,6 +117,7 @@ export function PhoneSettingsApp({ onClose, onNotice }: SettingsPageProps) {
     const [floatingDockEnabled, setFloatingDockEnabled] = useState(false);
     const [floatingDockSheetOpen, setFloatingDockSheetOpen] = useState(false);
     const [keepAlive, setKeepAlive] = useState(false);
+    const [globalAiMode, setGlobalAiMode] = useState(false);
     // 角色电脑：施工中弹窗（返回 / 仍要看看）
     const pageBodyRef = useRef<HTMLDivElement | null>(null);
 
@@ -253,6 +256,13 @@ export function PhoneSettingsApp({ onClose, onNotice }: SettingsPageProps) {
         onNotice(next ? "已开启后台保活" : "已关闭后台保活");
     }, [onNotice]);
 
+    const handleGlobalAiModeChange = useCallback((next: boolean) => {
+        setGlobalAiMode(next);
+        const config = loadMultiControllerConfig();
+        saveMultiControllerConfig({ ...config, globalAiMode: next });
+        onNotice(next ? "已开启全局AI模式：所有可操控角色临时变为AI" : "已关闭全局AI模式：可手动切换操控角色");
+    }, [onNotice]);
+
     const imageGenerationItem = SETTINGS_MENU.find(i => i.id === "imageGeneration")!;
     const imageGenerationFeaturedItem: FeaturedCardItem = {
         id: imageGenerationItem.id,
@@ -355,6 +365,8 @@ export function PhoneSettingsApp({ onClose, onNotice }: SettingsPageProps) {
         setQuickActionEnabled(settings.quickActionEnabled === true);
         setFloatingDockEnabled(settings.floatingDockEnabled === true);
         setKeepAlive(loadKeepAlive());
+        const multiControllerConfig = loadMultiControllerConfig();
+        setGlobalAiMode(multiControllerConfig.globalAiMode);
     }, []);
 
     // Listen for mascot navigation mode (e.g. jump to worldbook/regex tab)
@@ -449,6 +461,16 @@ export function PhoneSettingsApp({ onClose, onNotice }: SettingsPageProps) {
                                     <div className="card-featured-desc">切到后台时尽量保持网页运行，主动消息与轮询不中断</div>
                                 </div>
                                 <Toggle checked={keepAlive} onChange={handleKeepAliveChange} className="settings-toggle-control" />
+                            </div>
+                            <div className="app-card card-featured settings-toggle-card">
+                                <span className="card-icon card-icon-glass">
+                                    <GlassIcon name="identity" />
+                                </span>
+                                <div className="card-featured-body">
+                                    <div className="card-featured-label">全局AI模式</div>
+                                    <div className="card-featured-desc">开启后所有可操控角色(A类)临时变为AI，关闭后可手动切换操控</div>
+                                </div>
+                                <Toggle checked={globalAiMode} onChange={handleGlobalAiModeChange} className="settings-toggle-control" />
                             </div>
                         </div>
                         {isAdmin ? (

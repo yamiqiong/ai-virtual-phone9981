@@ -16,7 +16,6 @@ export type UserIdentity = {
     age: string;
     occupation: string;
     customSettings: string;
-    locked?: boolean; // 锁定状态：true时禁止编辑
 };
 
 const DEFAULT_IDENTITIES: UserIdentity[] = [
@@ -335,6 +334,21 @@ export function UserIdentitySettings() {
                                                 rows={4}
                                                 className="ui-textarea"
                                             />
+                                        </div>
+
+                                        <div className="flex flex-col gap-1">
+                                            <label className="menu-desc ml-1">锁定 (Lock)</label>
+                                            <label className="inline-flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-[var(--c-hover)]">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={identity.locked || false}
+                                                    onChange={(e) => updateIdentity(identity.id, { locked: e.target.checked })}
+                                                    className="cursor-pointer"
+                                                />
+                                                <span className="menu-label">
+                                                    {identity.locked ? '🔒 已锁定（禁止编辑）' : '解锁状态'}
+                                                </span>
+                                            </label>
                                         </div>
                                     </>
                                 )
