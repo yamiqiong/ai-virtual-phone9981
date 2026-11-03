@@ -94,6 +94,7 @@ export type ChatMessage = {
     status: ChatMessageStatus;
     createdAt: string; // ISO date
     order?: number; // Stable per-session display order
+    senderIdentityId?: string; // 多主控：user 消息发送时使用的主控身份 ID
     responseBatchId?: string; // Assistant raw-response batch id
     rawResponseText?: string; // Assistant raw response before parsing/splitting
     responseRoundId?: string; // Group-chat whole-round id shared across all bubbles in one assistant turn

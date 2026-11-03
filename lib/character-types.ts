@@ -12,6 +12,10 @@ export type Character = {
   createdAt: string;
   updatedAt: string;
 
+  // 多主控功能扩展
+  characterType?: 'ai' | 'controllable'; // 角色类型：ai=正常AI角色，controllable=可操控角色（A类）
+  locked?: boolean; // 锁定状态：true时禁止编辑人设和头像
+
   // 画布坐标与渲染属性
   canvasX?: number;
   canvasY?: number;

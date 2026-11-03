@@ -85,6 +85,7 @@ const BINDINGS_KEY = "ai_phone_bindings_v1";
 const FOLLOW_UP_CONFIG_KEY = "ai_phone_follow_up_config_v1";
 const CHAT_SEND_CONFIG_KEY = "ai_phone_chat_send_config_v1";
 const USER_IDENTITIES_KEY = "ai_phone_user_identities_v1";
+const MULTI_CONTROLLER_CONFIG_KEY = "ai_phone_multi_controller_config_v1";
 
 // Legacy key for migration
 const LEGACY_OVERRIDES_KEY = "ai_phone_char_settings_v1";
@@ -95,6 +96,7 @@ registerKvMigration(BINDINGS_KEY);
 registerKvMigration(FOLLOW_UP_CONFIG_KEY);
 registerKvMigration(CHAT_SEND_CONFIG_KEY);
 registerKvMigration(USER_IDENTITIES_KEY);
+registerKvMigration(MULTI_CONTROLLER_CONFIG_KEY);
 registerKvMigration(LEGACY_OVERRIDES_KEY);
 
 // --- Helpers ---
@@ -1227,4 +1229,33 @@ function migrateLegacyOverrides(): BindingConfig | null {
     } catch {
         return null;
     }
+}
+
+// --- Multi-Controller Configuration ---
+
+export type MultiControllerConfig = {
+    /** 全局模式：开启时所有可操控角色(controllable)变为AI角色 */
+    globalAiMode: boolean;
+    /** 当前激活的主控身份 ID（发消息时使用） */
+    activeIdentityId?: string;
+};
+
+export function loadMultiControllerConfig(): MultiControllerConfig {
+    if (typeof window === "undefined") return { globalAiMode: false };
+    try {
+        const raw = kvGet(MULTI_CONTROLLER_CONFIG_KEY);
+        if (!raw) return { globalAiMode: false };
+        const parsed = JSON.parse(raw) as MultiControllerConfig;
+        return {
+            globalAiMode: parsed.globalAiMode === true,
+            activeIdentityId: parsed.activeIdentityId,
+        };
+    } catch {
+        return { globalAiMode: false };
+    }
+}
+
+export function saveMultiControllerConfig(config: MultiControllerConfig): void {
+    if (typeof window === "undefined") return;
+    kvSet(MULTI_CONTROLLER_CONFIG_KEY, JSON.stringify(config));
 }

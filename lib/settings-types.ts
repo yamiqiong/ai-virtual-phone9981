@@ -21,6 +21,8 @@ export type WorldBookEntry = {
     useProbability?: boolean;
     role?: number;
     insertion_order: number;
+    /** 主控人设引用：填写主控身份 ID 时自动从该身份生成内容 */
+    userIdentityRef?: string;
 };
 
 export type WorldBookConfig = SettingItemMeta & {

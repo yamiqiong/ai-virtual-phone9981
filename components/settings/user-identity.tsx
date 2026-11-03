@@ -16,6 +16,7 @@ export type UserIdentity = {
     age: string;
     occupation: string;
     customSettings: string;
+    locked?: boolean; // 锁定状态：true时禁止编辑
 };
 
 const DEFAULT_IDENTITIES: UserIdentity[] = [
