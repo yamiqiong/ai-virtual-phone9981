@@ -77,6 +77,10 @@ export type ChatSession = {
     groupMutes?: Record<string, string>; // (characterId | "self") → mute expiry ISO
     allowAdminActionsOnUser?: boolean; // characters may kick/mute the user (default off)
     isSpectator?: boolean; // 围观群：用户不在群内，只能生成/线下
+    // Offline scene mode (multi-controller)
+    isOfflineScene?: boolean; // 线下剧情场景模式
+    sceneName?: string; // 场景名称
+    sceneParticipants?: string[]; // 当前在场的角色ID列表（characterId数组）
 };
 
 export type ChatMessageStatus = "sending" | "sent" | "read" | "failed";
@@ -94,7 +98,6 @@ export type ChatMessage = {
     status: ChatMessageStatus;
     createdAt: string; // ISO date
     order?: number; // Stable per-session display order
-    senderIdentityId?: string; // 多主控：user 消息发送时使用的主控身份 ID
     responseBatchId?: string; // Assistant raw-response batch id
     rawResponseText?: string; // Assistant raw response before parsing/splitting
     responseRoundId?: string; // Group-chat whole-round id shared across all bubbles in one assistant turn

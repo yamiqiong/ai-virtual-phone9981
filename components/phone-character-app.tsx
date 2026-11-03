@@ -1890,6 +1890,8 @@ function CharArchiveView({
   const [polaroidImageX, setPolaroidImageX] = useState(char.polaroidImageX ?? 50);
   const [polaroidImageY, setPolaroidImageY] = useState(char.polaroidImageY ?? 50);
   const [polaroidImageZoom, setPolaroidImageZoom] = useState(char.polaroidImageZoom ?? 1);
+  const [characterType, setCharacterType] = useState<'ai' | 'controllable'>(char.characterType || 'ai');
+  const [locked, setLocked] = useState(char.locked || false);
   const previewPointers = useRef(new Map<number, { x: number; y: number }>());
   const previewGesture = useRef<{ distance: number; zoom: number } | null>(null);
   const previewImageState = useRef({ x: polaroidImageX, y: polaroidImageY, zoom: polaroidImageZoom });
@@ -1978,6 +1980,8 @@ function CharArchiveView({
     if (polaroidImageX !== (char.polaroidImageX ?? 50)) return true;
     if (polaroidImageY !== (char.polaroidImageY ?? 50)) return true;
     if (polaroidImageZoom !== (char.polaroidImageZoom ?? 1)) return true;
+    if (characterType !== (char.characterType || 'ai')) return true;
+    if (locked !== (char.locked || false)) return true;
     const origTags = char.tags || [];
     if (tags.length !== origTags.length || tags.some((t, i) => t !== origTags[i])) return true;
     return false;
@@ -2008,6 +2012,8 @@ function CharArchiveView({
       setPolaroidImageX(char.polaroidImageX ?? 50);
       setPolaroidImageY(char.polaroidImageY ?? 50);
       setPolaroidImageZoom(char.polaroidImageZoom ?? 1);
+      setCharacterType(char.characterType || 'ai');
+      setLocked(char.locked || false);
       previewImageState.current = {
         x: char.polaroidImageX ?? 50,
         y: char.polaroidImageY ?? 50,
@@ -2073,6 +2079,8 @@ function CharArchiveView({
         polaroidImageX: clampCharacterImageValue(polaroidImageX, 0, 100, 50),
         polaroidImageY: clampCharacterImageValue(polaroidImageY, 0, 100, 50),
         polaroidImageZoom: clampCharacterImageValue(polaroidImageZoom, 1, 3, 1),
+        characterType,
+        locked,
       }, createVersion);
     }
   }
@@ -2322,6 +2330,41 @@ function CharArchiveView({
               <div className="char-archive-cell" style={{ flex: 1.1 }}>
                 <span className="char-archive-label">Update</span>
                 <span className="char-archive-val">{char.updatedAt ? char.updatedAt.slice(0, 10).replace(/-/g, "/") : "N/A"}</span>
+              </div>
+            </div>
+
+            <div className="char-archive-row">
+              <div className="char-archive-cell" style={{ flex: 1.5 }}>
+                <span className="char-archive-label">Type</span>
+                {isEditing ? (
+                  <select
+                    value={characterType || 'ai'}
+                    onChange={e => setCharacterType(e.target.value as 'ai' | 'controllable')}
+                    className="char-archive-select"
+                    style={{ background: 'var(--c-input)', border: '1px solid #666', padding: '2px 4px', fontSize: 'calc(10px*var(--app-text-scale,1))' }}
+                  >
+                    <option value="ai">AI角色</option>
+                    <option value="controllable">可操控(A类)</option>
+                  </select>
+                ) : (
+                  <span className="char-archive-val">{characterType === 'controllable' ? '可操控' : 'AI'}</span>
+                )}
+              </div>
+              <div className="char-archive-cell" style={{ flex: 1.5 }}>
+                <span className="char-archive-label">Lock</span>
+                {isEditing ? (
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={locked || false}
+                      onChange={e => setLocked(e.target.checked)}
+                      className="cursor-pointer"
+                    />
+                    <span className="char-archive-val ts-10">{locked ? 'LOCKED' : 'UNLOCKED'}</span>
+                  </label>
+                ) : (
+                  <span className="char-archive-val">{locked ? '🔒 LOCKED' : 'UNLOCKED'}</span>
+                )}
               </div>
             </div>
 
